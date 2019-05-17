@@ -6,14 +6,15 @@ using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 
 using CurrencyChecker.Models;
-using CurrencyChecker.Services;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Ioc;
+using System.Threading.Tasks;
 
 namespace CurrencyChecker.ViewModels
 {
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : ViewModelBase
     {
-        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>() ?? new MockDataStore();
-
+        protected INavigation Navigation => SimpleIoc.Default.GetInstance<INavigation>();
         bool isBusy = false;
         public bool IsBusy
         {
@@ -37,20 +38,13 @@ namespace CurrencyChecker.ViewModels
 
             backingStore = value;
             onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
+            RaisePropertyChanged(propertyName);
             return true;
         }
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        virtual public Task Init()
         {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return Task.CompletedTask;
         }
-        #endregion
     }
 }

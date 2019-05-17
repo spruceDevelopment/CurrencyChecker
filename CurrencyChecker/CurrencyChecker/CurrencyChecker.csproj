@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MvvmLightLibsStd10" Version="5.4.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Xamarin.Forms" Version="3.6.0.344457" />  
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\CurrentPage.xaml.cs">
+      <DependentUpon>CurrentPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MainadsfsdgsfgPage.xaml.cs">
+      <DependentUpon>MainadsfsdgsfgPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
