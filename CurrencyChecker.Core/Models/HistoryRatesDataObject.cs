@@ -1,18 +1,29 @@
 ﻿using Newtonsoft.Json;
+using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CurrencyChecker.Core.Models
 {
     public class HistoryRatesDataObject
     {
-        public HistoryRatesDataObject(Dictionary<string, KeyValuePair<string, float>> rates)
-        {
-            HistoryRates = rates;
-        }
-
+        [PrimaryKey]
+        public string? DatabaseKey { get; set; }
         [JsonProperty("base")]
         public string? Base { get; set; }
-        public Dictionary<string, KeyValuePair<string, float>> HistoryRates { get; }
+        [JsonProperty("rates"), Ignore]
+        public Dictionary<string, float>? HistoryRates { get; set; }
+
+
+
+        public string? Target;
+        public string? end_at;
+        public string? start_at;
+
+        public string GenerateDBKey()
+        {
+            return Base + "_" + Target + "_" + end_at;
+        }
     }
 }

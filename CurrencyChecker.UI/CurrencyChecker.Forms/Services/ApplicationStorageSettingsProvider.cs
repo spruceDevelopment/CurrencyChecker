@@ -16,12 +16,8 @@ namespace CurrencyChecker.Forms.Services
             {
                 if (key == "baseCurrency")
                     Application.Current.Properties[key] = "EUR";
-                else if (key == "startDate")
-                    Application.Current.Properties[key] = DateTime.Today.AddDays(-30);
-                else if (key == "endDate")
-                    Application.Current.Properties[key] = DateTime.Today;
                 else
-                    return default(T)!;
+                    return default!;
             }
             return (T)Application.Current.Properties[key];
         }

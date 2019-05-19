@@ -20,16 +20,17 @@ namespace CurrencyChecker.Core.Test
     public class MainViewModelTest
     {
         MainViewModel _mainViewModel;
-        ICurrencyService _currencyService;
+        IExternalCurrencyService _currencyService;
         ISettingsProvider _settingsProvider;
         IErrorHandler _errorHandler;
+        ILocalCurrencyService _localCurrencyService;
         INavigator _navigator;
         [SetUp]
         public void Setup()
         {
             SimpleIoc.Default.Reset();
             Messenger.Reset();
-            _currencyService = MockRepository.GenerateMock<ICurrencyService>();
+            _currencyService = MockRepository.GenerateMock<IExternalCurrencyService>();
             _currencyService.Stub(x => x.GetCurrentRates("EUR")).Repeat.Any().Return(Task.FromResult(new CurrentRatesDataObject(
                  new Dictionary<string, float>()
                 {
@@ -44,21 +45,32 @@ namespace CurrencyChecker.Core.Test
 
             _errorHandler = MockRepository.GenerateMock<IErrorHandler>();
 
+            _localCurrencyService = MockRepository.GenerateMock<ILocalCurrencyService>();
+
             _navigator = MockRepository.GenerateMock<INavigator>();
             SimpleIoc.Default.Register(() => _navigator);
 
-            _mainViewModel = new MainViewModel(_currencyService, _settingsProvider, _errorHandler);
+            _mainViewModel = new MainViewModel(_currencyService, _settingsProvider, _errorHandler, _localCurrencyService);
         }
 
         [Test]
         public async Task InitialState()
         {
+            bool emptyChanged = false;
+            _mainViewModel.PropertyChanged += (s, arg) =>
+            {
+                if (arg.PropertyName == nameof(_mainViewModel.IsEmpty))
+                    emptyChanged = true;
+            };
+
             await _mainViewModel.Init();
 
             Assert.AreEqual("1 EUR = ", _mainViewModel.TopLabelText);
             Assert.AreEqual(3, _mainViewModel.Items.Count);
-            Assert.AreEqual("USD", _mainViewModel.Items[1].TargetKey);
-            Assert.AreEqual("1.0587", _mainViewModel.Items[1].DisplayValue);
+            Assert.AreEqual("USD", _mainViewModel.Items[2].TargetKey);
+            Assert.AreEqual("1.0587", _mainViewModel.Items[2].DisplayValue);
+            Assert.IsTrue(emptyChanged);
+            Assert.IsFalse(_mainViewModel.IsEmpty);
         }
 
 
@@ -80,13 +92,14 @@ namespace CurrencyChecker.Core.Test
             await _mainViewModel.Init();
             _currencyService.ClearBehavior();
             _currencyService.Stub(x => x.GetCurrentRates("EUR")).Repeat.Any().Return(Task.FromResult(new CurrentRatesDataObject(new Dictionary<string, float> {
+                     {"CZK", 27.05f },
                     { "PLN", 4.20f },
                     {"USD", 1.15f },
-                    {"CZK", 27.05f }, })));
+                    })));
 
             await _mainViewModel.RefreshCommand.ExecuteAsync();
 
-            Assert.AreEqual("1.1500", _mainViewModel.Items[1].DisplayValue);
+            Assert.AreEqual("1.1500", _mainViewModel.Items[2].DisplayValue);
         }
 
 

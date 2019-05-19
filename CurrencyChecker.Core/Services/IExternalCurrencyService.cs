@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyChecker.Core.Services
 {
-    public interface ICurrencyService
+    public interface IExternalCurrencyService
     {
         Task<CurrentRatesDataObject?> GetCurrentRates(string baseCurrency);
         Task<HistoryRatesDataObject?> GetHistoryRates(string baseCurrency, string target, DateTime startDate, DateTime endDate);

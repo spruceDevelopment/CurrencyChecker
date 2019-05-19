@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyChecker.Core.Services
 {
-    public class ExternalCurrencyService : ICurrencyService
+    public class ExternalCurrencyService : IExternalCurrencyService
     {
       
         static HttpClient _httpClient = new HttpClient();
@@ -37,12 +37,13 @@ namespace CurrencyChecker.Core.Services
                 return null;
             var content = await result.Content.ReadAsStringAsync();
 
+
             var ratesToken = JObject.Parse(content).GetValue("rates").ToList();
             List<JProperty> properties = new List<JProperty>();
             ratesToken.ForEach(x => properties.Add((JProperty)x));
-            Dictionary<string, KeyValuePair<string, float>> keyValuePairs = new Dictionary<string, KeyValuePair<string, float>>();
-            properties.ForEach(x => keyValuePairs.Add(x.Name, new KeyValuePair<string, float>(target, (float)x.Value[target])));
-            HistoryRatesDataObject historyRatesDataObject = new HistoryRatesDataObject(keyValuePairs);
+            Dictionary<string, float> keyValuePairs = new Dictionary<string, float>();
+            properties.ForEach(x => keyValuePairs.Add(x.Name, (float)x.Value[target]));
+            HistoryRatesDataObject historyRatesDataObject = new HistoryRatesDataObject { HistoryRates = keyValuePairs, Base = baseCurrency, end_at = endDate.ToString("yyyy-MM-dd"), start_at = startDate.ToString("yyyy-MM-dd"), Target = target };
             return historyRatesDataObject;
         }
 

@@ -17,27 +17,40 @@ namespace CurrencyChecker.Core.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private readonly ICurrencyService _currencyService;
+        private readonly IExternalCurrencyService _currencyService;
         private readonly ISettingsProvider _settingsProvider;
         private readonly IErrorHandler _errorHandler;
+        private readonly ILocalCurrencyService _localCurrencyService;
         private string _searchText = "";
 
         private readonly List<RateViewModel> _sourceItems = new List<RateViewModel>();
         public ObservableCollection<RateViewModel> Items { get; set; }
         public IAsyncCommand RefreshCommand { get; }
         public IAsyncCommand<RateViewModel> ItemTappedCommand { get; }
-        public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value, onChanged: FilterAndDisplay); } }
+        public IAsyncCommand LocalDataCommand { get; }
+        public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value, onChanged: FilterSortAndDisplay); } }
         public string TopLabelText => $"1 {_settingsProvider.GetValue<string>("baseCurrency")} = ";
-        public MainViewModel(ICurrencyService currencyService, ISettingsProvider settingsProvider, IErrorHandler errorHandler)
+        public bool IsEmpty => Items.Count == 0 && !IsBusy;
+        public MainViewModel(IExternalCurrencyService currencyService, ISettingsProvider settingsProvider, IErrorHandler errorHandler, ILocalCurrencyService localCurrencyService)
         {
             Title = "Currency Checker";
             Items = new ObservableCollection<RateViewModel>();
+            Items.CollectionChanged += (s, a) => RaisePropertyChanged(nameof(IsEmpty));
+            PropertyChanged += (s, arg) => { if (arg.PropertyName == nameof(IsBusy)) RaisePropertyChanged(nameof(IsEmpty)); };
             RefreshCommand = new AsyncCommand(LoadCurrencies, errorHandler: errorHandler);
-            ItemTappedCommand = new AsyncCommand<RateViewModel>(ItemTapped);
+            ItemTappedCommand = new AsyncCommand<RateViewModel>(ItemTapped, errorHandler: errorHandler);
+            LocalDataCommand = new AsyncCommand(LocalData, errorHandler: errorHandler);
             this._currencyService = currencyService;
             this._settingsProvider = settingsProvider;
             this._errorHandler = errorHandler;
+            this._localCurrencyService = localCurrencyService;
             MessengerInstance.Register<BaseCurrencyChangedMessage>(this, OnBaseCurrencyChangedMessage);
+        }
+
+
+        private async Task LocalData()
+        {
+            await Navigator.PushAsync("pickLocalData");
         }
 
         private async Task ItemTapped(RateViewModel vm)
@@ -66,8 +79,8 @@ namespace CurrencyChecker.Core.ViewModels
                 CurrentRatesDataObject? result = await _currencyService.GetCurrentRates(_settingsProvider.GetValue<string>("baseCurrency"));
                 if (result?.Rates != null)
                     foreach (var item in result.Rates)
-                        _sourceItems.Add(new RateViewModel(result.Base ?? "", item.Key, item.Value, _currencyService, _settingsProvider));
-                FilterAndDisplay();
+                        _sourceItems.Add(new RateViewModel(result.Base ?? "", item.Key, item.Value, _currencyService, _settingsProvider, _localCurrencyService));
+                FilterSortAndDisplay();
             }
             finally
             {
@@ -75,10 +88,10 @@ namespace CurrencyChecker.Core.ViewModels
             }
         }
 
-        private void FilterAndDisplay()
+        private void FilterSortAndDisplay()
         {
             Items.Clear();
-            foreach (var item in _sourceItems.Where(x=>x.TargetKey.ToLower().Contains(SearchText)))
+            foreach (var item in _sourceItems.Where(x=>x.TargetKey.ToLower().Contains(SearchText)).OrderBy(y=>y.TargetKey))
                 Items.Add(item);
         }
     }

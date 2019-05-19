@@ -27,6 +27,9 @@
     <Compile Update="Views\DetailsPage.xaml.cs">
       <DependentUpon>DetailsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\PickLocalDataPage.xaml.cs">
+      <DependentUpon>PickLocalDataPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

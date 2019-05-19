@@ -45,10 +45,12 @@ namespace CurrencyChecker.Forms
         private void ConfigureIoc()
         {
 
-            SimpleIoc.Default.Register<ICurrencyService, ExternalCurrencyService>();
+            SimpleIoc.Default.Register<ILocalCurrencyService, LocalCurrencyService>();
+            SimpleIoc.Default.Register<IExternalCurrencyService, ExternalCurrencyService>();
             SimpleIoc.Default.Register<IErrorHandler, AlertErrorHandler>();
             SimpleIoc.Default.Register<ISettingsProvider, ApplicationStorageSettingsProvider>();
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<PickLocalDataViewModel>();
         }
     }
 }

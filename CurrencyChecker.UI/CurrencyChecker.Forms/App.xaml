@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Application xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CurrencyChecker.Forms.App">
+             x:Class="CurrencyChecker.Forms.App"
+             xmlns:helpers="clr-namespace:CurrencyChecker.Forms.Helpers">
     <Application.Resources>
         <ResourceDictionary>
             <!--Global Styles-->
@@ -10,6 +11,7 @@
                 <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
                 <Setter Property="BarTextColor" Value="White" />
             </Style>
+            <helpers:InvertBoolConverter x:Key="InvertBool"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

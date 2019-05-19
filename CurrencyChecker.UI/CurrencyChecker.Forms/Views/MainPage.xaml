@@ -6,11 +6,16 @@
              x:Name="BrowseItemsPage" 
              xmlns:vm="clr-namespace:CurrencyChecker.Core.ViewModels;assembly=CurrencyChecker.Core"
              x:DataType="vm:MainViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Lokalne" Command="{Binding LocalDataCommand}"/>
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="{Binding TopLabelText}" HorizontalOptions="Center" FontSize="20"/>
-            <SearchBar Placeholder="Szukaj waluty..." Text="{Binding SearchText}" HorizontalOptions="Center" WidthRequest="200"/>
-            <ListView x:Name="ItemsListView" 
+        <Grid>
+            <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Text="Pusto" IsVisible="{Binding IsEmpty}"/>
+            <StackLayout IsVisible="{Binding IsEmpty,Converter={StaticResource InvertBool}}">
+                <Label Text="{Binding TopLabelText}" HorizontalOptions="Center" FontSize="20"/>
+                <SearchBar Placeholder="Szukaj waluty..." Text="{Binding SearchText}" HorizontalOptions="Center" WidthRequest="200"/>
+                <ListView x:Name="ItemsListView" 
                 ItemsSource="{Binding Items}"
                       SelectionMode="None"
                 VerticalOptions="FillAndExpand"
@@ -20,21 +25,22 @@
                  IsRefreshing="{Binding IsBusy, Mode=OneWay}"
                  CachingStrategy="RecycleElement" SeparatorVisibility="None" 
                       ItemTapped="ItemsListView_ItemTapped">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell x:DataType="vm:RateViewModel">
-                            <Grid Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Label Text="{Binding TargetKey}" Style="{DynamicResource ListItemTextStyle}" FontSize="16"  FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                <Label Grid.Column="1" Text="{Binding DisplayValue}" LineBreakMode="NoWrap" FontSize="16" Style="{DynamicResource ListItemDetailTextStyle}"/>
-                            </Grid>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell x:DataType="vm:RateViewModel">
+                                <Grid Padding="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Text="{Binding TargetKey}" Style="{DynamicResource ListItemTextStyle}" FontSize="16"  FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Column="1" Text="{Binding DisplayValue}" LineBreakMode="NoWrap" FontSize="16" Style="{DynamicResource ListItemDetailTextStyle}"/>
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

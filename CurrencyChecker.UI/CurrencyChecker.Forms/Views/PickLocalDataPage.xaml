@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CurrencyChecker.Forms.Views.PickLocalDataPage"
+              Title="{Binding Title}"
+             x:Name="BrowseItemsPage" 
+             xmlns:vm="clr-namespace:CurrencyChecker.Core.ViewModels;assembly=CurrencyChecker.Core"
+             x:DataType="vm:PickLocalDataViewModel">
+    <ContentPage.Content>
+        <Grid>
+            <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Text="Pusto" IsVisible="{Binding IsEmpty}"/>
+            <ListView IsVisible="{Binding IsEmpty, Converter={StaticResource InvertBool}}" x:Name="ItemsListView" 
+                ItemsSource="{Binding Items}"
+                      SelectionMode="None"
+                 HasUnevenRows="true"
+                 IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                 CachingStrategy="RecycleElement"
+                      ItemTapped="ItemsListView_ItemTapped">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell x:DataType="vm:LocalDataRecordViewModel">
+                            <StackLayout Orientation="Horizontal" Padding="10">
+                                <Label Text="{Binding DisplayName}" Style="{DynamicResource ListItemTextStyle}" FontSize="16"  FontAttributes="Bold" VerticalOptions="Center"/>
+                                <Button Text="Usuń" Command="{Binding RemoveDataRecordCommand}" HorizontalOptions="EndAndExpand" Style="{DynamicResource ListItemDetailTextStyle}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

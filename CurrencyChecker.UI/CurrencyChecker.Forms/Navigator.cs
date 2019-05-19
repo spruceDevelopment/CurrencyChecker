@@ -19,6 +19,9 @@ namespace CurrencyChecker.Forms
         {
             _navigation = navigation;
             _pagesDictionary.Add("details", typeof(DetailsPage));
+            _pagesDictionary.Add("pickLocalData", typeof(PickLocalDataPage));
+            //_pagesDictionary.Add("localDataDetails", typeof(?));
+
         }
 
         public async Task GoBackAsync()
@@ -30,9 +33,14 @@ namespace CurrencyChecker.Forms
         {
             if (!string.IsNullOrWhiteSpace(pageKey))
             {
-                Page page = (Page)Activator.CreateInstance(_pagesDictionary[pageKey], args: viewModel);
+                Page page;
+                if (viewModel != null)
+                    page = (Page)Activator.CreateInstance(_pagesDictionary[pageKey], args: viewModel);
+                else
+                    page = (Page)Activator.CreateInstance(_pagesDictionary[pageKey]);
                 await _navigation.PushAsync(page);
-                viewModel?.Init();
+                if(page?.BindingContext is BaseViewModel bvm)
+                    bvm?.Init();
             }
         }
 

@@ -18,33 +18,35 @@ namespace CurrencyChecker.Core.Test
     public class RateViewModelTest
     {
         RateViewModel _rateViewModel;
-        ICurrencyService _currencyService;
+        IExternalCurrencyService _currencyService;
         ISettingsProvider _settingsProvider;
+        ILocalCurrencyService _localCurrencyService;
         [SetUp]
         public void Setup()
         {
             SimpleIoc.Default.Reset();
-            DateTime startDate = new DateTime(2019, 4, 20);
-            DateTime endDate = new DateTime(2019, 5, 19);
-            _currencyService = MockRepository.GenerateMock<ICurrencyService>();
-            _currencyService.Stub(x => x.GetHistoryRates("EUR", "PLN", startDate, endDate)).Repeat.Any().Return(Task.FromResult(new HistoryRatesDataObject(
-                new Dictionary<string, KeyValuePair<string, float>>()
+            _currencyService = MockRepository.GenerateMock<IExternalCurrencyService>();
+            _currencyService.Stub(x => x.GetHistoryRates("EUR", "PLN", DateTime.Today.AddDays(-30), DateTime.Today)).Repeat.Any().Return(Task.FromResult(new HistoryRatesDataObject
+            {
+                HistoryRates =
+                new Dictionary<string,  float>()
                 {
-                    {"2019-04-20", new KeyValuePair<string, float>("PLN",0.21054f) },
-                    {"2019-04-27", new KeyValuePair<string, float>("PLN",0.21164f) },
-                    {"2019-05-04", new KeyValuePair<string, float>("PLN",0.21004f) },
-                    {"2019-05-11", new KeyValuePair<string, float>("PLN",0.21210f) },
-                    {"2019-05-18", new KeyValuePair<string, float>("PLN",0.21698f) },
-                })
+                    {"2019-04-20", 0.21054f },
+                    {"2019-04-27", 0.21164f },
+                    {"2019-05-04", 0.21004f },
+                    {"2019-05-11", 0.21210f },
+                    {"2019-05-18", 0.21698f },
+                }
+            }
             ));
 
             
 
             _settingsProvider = MockRepository.GenerateMock<ISettingsProvider>();
-            _settingsProvider.Stub(x => x.GetValue<DateTime>("startDate")).Repeat.Any().Return(startDate);
-            _settingsProvider.Stub(x => x.GetValue<DateTime>("endDate")).Repeat.Any().Return(endDate);
 
-            _rateViewModel = new RateViewModel("EUR", "PLN", 4.30f, _currencyService, _settingsProvider);
+            _localCurrencyService = MockRepository.GenerateMock<ILocalCurrencyService>();
+
+            _rateViewModel = new RateViewModel("EUR", "PLN", 4.30f, _currencyService, _settingsProvider, _localCurrencyService);
         }
 
         [Test]
@@ -56,12 +58,12 @@ namespace CurrencyChecker.Core.Test
 
 
         [Test]
-        public async Task Initialization_ChartEntriesSortedAndFilled()
+        public async Task Initialization_ChartEntriesFilled()
         {
             await _rateViewModel.Init();
 
             Assert.AreEqual(5, _rateViewModel.Chart.Entries.Count());
-            Assert.AreEqual(0.21210f, _rateViewModel.Chart.Entries.ElementAt(_rateViewModel.Chart.Entries.Count() - 4).Value);
+            Assert.AreEqual(0.21210f, _rateViewModel.Chart.Entries.ElementAt(3).Value);
         }
 
 
@@ -80,6 +82,19 @@ namespace CurrencyChecker.Core.Test
             _settingsProvider.AssertWasCalled(x => x.SetValue("baseCurrency", "PLN"));
             Assert.IsTrue(called);
             navigatorMock.AssertWasCalled(x=>x.GoBackAsync());
+        }
+
+
+        [Test]
+        public async Task SaveDataCommand_DatabaseSaved()
+        {
+            await _rateViewModel.Init();
+
+            _localCurrencyService.Expect(x => x.AddRecordAsync(null)).IgnoreArguments().Return(Task.CompletedTask);
+
+            await _rateViewModel.SaveDataCommand.ExecuteAsync();
+
+            _localCurrencyService.VerifyAllExpectations();
         }
     }
 }
