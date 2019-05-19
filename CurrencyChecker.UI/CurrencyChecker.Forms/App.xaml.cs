@@ -7,6 +7,7 @@ using CurrencyChecker.Core.Services;
 using CurrencyChecker.Core.Contracts;
 using CurrencyChecker.Forms.Services;
 using CurrencyChecker.Core.ViewModels;
+using CurrencyChecker.Core.Helpers;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace CurrencyChecker.Forms
@@ -19,8 +20,11 @@ namespace CurrencyChecker.Forms
             InitializeComponent();
             ConfigureIoc();
 
-            MainPage = new MainPage();
-            SimpleIoc.Default.Register(() => MainPage.Navigation);
+            var mainVm = SimpleIoc.Default.GetInstance<MainViewModel>();
+            MainPage = new NavigationPage(new MainPage(mainVm));
+            mainVm.Init().FireAndForgetSafeAsync(SimpleIoc.Default.GetInstance<IErrorHandler>());
+            SimpleIoc.Default.Register<INavigation>(()=>MainPage.Navigation);
+            SimpleIoc.Default.Register<INavigator, Navigator>();
         }
 
         protected override void OnStart()

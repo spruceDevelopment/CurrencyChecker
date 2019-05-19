@@ -25,16 +25,24 @@ namespace CurrencyChecker.Core.ViewModels
         private readonly List<RateViewModel> _sourceItems = new List<RateViewModel>();
         public ObservableCollection<RateViewModel> Items { get; set; }
         public IAsyncCommand RefreshCommand { get; }
-        public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value, onChanged:FilterAndDisplay); } }
+        public IAsyncCommand<RateViewModel> ItemTappedCommand { get; }
+        public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value, onChanged: FilterAndDisplay); } }
+        public string TopLabelText => $"1 {_settingsProvider.GetValue<string>("baseCurrency")} = ";
         public MainViewModel(ICurrencyService currencyService, ISettingsProvider settingsProvider, IErrorHandler errorHandler)
         {
-            Title = "Browse";
+            Title = "Currency Checker";
             Items = new ObservableCollection<RateViewModel>();
             RefreshCommand = new AsyncCommand(LoadCurrencies, errorHandler: errorHandler);
+            ItemTappedCommand = new AsyncCommand<RateViewModel>(ItemTapped);
             this._currencyService = currencyService;
             this._settingsProvider = settingsProvider;
             this._errorHandler = errorHandler;
             MessengerInstance.Register<BaseCurrencyChangedMessage>(this, OnBaseCurrencyChangedMessage);
+        }
+
+        private async Task ItemTapped(RateViewModel vm)
+        {
+            await Navigator.PushAsync("details", vm);
         }
 
         private void OnBaseCurrencyChangedMessage(BaseCurrencyChangedMessage obj)
@@ -52,12 +60,13 @@ namespace CurrencyChecker.Core.ViewModels
             try
             {
                 IsBusy = true;
+                RaisePropertyChanged(nameof(TopLabelText));
                 _sourceItems.Clear();
                 Items.Clear();
-                RatesDataObject? result = await _currencyService.GetCurrentRates(_settingsProvider.GetStringValue("baseCurrency"));
+                CurrentRatesDataObject? result = await _currencyService.GetCurrentRates(_settingsProvider.GetValue<string>("baseCurrency"));
                 if (result?.Rates != null)
                     foreach (var item in result.Rates)
-                        _sourceItems.Add(new RateViewModel(result.Base ?? "", item.Key, item.Value));
+                        _sourceItems.Add(new RateViewModel(result.Base ?? "", item.Key, item.Value, _currencyService, _settingsProvider));
                 FilterAndDisplay();
             }
             finally
@@ -69,7 +78,7 @@ namespace CurrencyChecker.Core.ViewModels
         private void FilterAndDisplay()
         {
             Items.Clear();
-            foreach (var item in _sourceItems.Where(x=>x.TargetName.ToLower().Contains(SearchText)))
+            foreach (var item in _sourceItems.Where(x=>x.TargetKey.ToLower().Contains(SearchText)))
                 Items.Add(item);
         }
     }

@@ -6,7 +6,7 @@ namespace CurrencyChecker.Core.Contracts
 {
     public interface ISettingsProvider
     {
-        string GetStringValue(string name);
+        T GetValue<T>(string name);
         void SetValue(string name, object value);
     }
 }

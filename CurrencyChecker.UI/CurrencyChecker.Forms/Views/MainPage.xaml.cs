@@ -9,6 +9,8 @@ using Xamarin.Forms.Xaml;
 
 using GalaSoft.MvvmLight.Ioc;
 using CurrencyChecker.Core.ViewModels;
+using CurrencyChecker.Core.Contracts;
+using CurrencyChecker.Core.Helpers;
 
 namespace CurrencyChecker.Forms.Views
 {
@@ -16,24 +18,22 @@ namespace CurrencyChecker.Forms.Views
     {
         MainViewModel _viewModel;
 
-        public MainPage()
+        public MainPage(MainViewModel viewModel)
         {
             InitializeComponent();
 
-            BindingContext = _viewModel = SimpleIoc.Default.GetInstance<MainViewModel>();
+            BindingContext = _viewModel = viewModel;
         }
 
-        //async void AddItem_Clicked(object sender, EventArgs e)
-        //{
-        //    await Navigation.PushModalAsync(new NavigationPage(new NewItemPage()));
-        //}
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
+        }
 
-            if (_viewModel.Items.Count == 0)
-                _viewModel.RefreshCommand.Execute(null);
+        private void ItemsListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            _viewModel.ItemTappedCommand.ExecuteAsync((RateViewModel)e.Item).FireAndForgetSafeAsync(SimpleIoc.Default.GetInstance<IErrorHandler>());
         }
     }
 }

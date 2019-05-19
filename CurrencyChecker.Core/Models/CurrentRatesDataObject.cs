@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace CurrencyChecker.Core.Models
 {
-    public class RatesDataObject
+    public class CurrentRatesDataObject
     {
-        public RatesDataObject(Dictionary<string, double> rates)
+        public CurrentRatesDataObject(Dictionary<string, float> rates)
         {
             Rates = rates;
         }
 
         [JsonProperty("base")]
         public string? Base { get; set; }
-        public Dictionary<string, double> Rates { get; }
+        public Dictionary<string, float> Rates { get; }
     }
 }

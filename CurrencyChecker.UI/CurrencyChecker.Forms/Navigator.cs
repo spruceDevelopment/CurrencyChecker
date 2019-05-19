@@ -1,6 +1,7 @@
 ﻿
 using CurrencyChecker.Core.Contracts;
 using CurrencyChecker.Core.ViewModels;
+using CurrencyChecker.Forms.Views;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,20 +13,29 @@ namespace CurrencyChecker.Forms
     public class Navigator : INavigator
     {
         private readonly INavigation _navigation;
+        private Dictionary<string, Type> _pagesDictionary = new Dictionary<string, Type>();
 
         public Navigator(INavigation navigation)
         {
             _navigation = navigation;
+            _pagesDictionary.Add("details", typeof(DetailsPage));
         }
 
-        public async Task Push(object page)
+        public async Task GoBackAsync()
         {
-            if (page is Page xamPage)
+            await _navigation.PopAsync();
+        }
+
+        public async Task PushAsync(string pageKey, BaseViewModel? viewModel)
+        {
+            if (!string.IsNullOrWhiteSpace(pageKey))
             {
-                await _navigation.PushAsync(xamPage);
-                if (xamPage.BindingContext is BaseViewModel vm)
-                    await vm.Init();
+                Page page = (Page)Activator.CreateInstance(_pagesDictionary[pageKey], args: viewModel);
+                await _navigation.PushAsync(page);
+                viewModel?.Init();
             }
         }
+
+        
     }
 }
