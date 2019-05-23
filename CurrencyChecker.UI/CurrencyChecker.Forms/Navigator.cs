@@ -18,9 +18,9 @@ namespace CurrencyChecker.Forms
         public Navigator(INavigation navigation)
         {
             _navigation = navigation;
-            _pagesDictionary.Add("details", typeof(DetailsPage));
+            _pagesDictionary.Add("details", typeof(RemoteDetailsPage));
             _pagesDictionary.Add("pickLocalData", typeof(PickLocalDataPage));
-            //_pagesDictionary.Add("localDataDetails", typeof(?));
+            _pagesDictionary.Add("localDataDetails", typeof(LocalDetailsPage));
 
         }
 

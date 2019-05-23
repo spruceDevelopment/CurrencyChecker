@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microchartsCore="clr-namespace:Microcharts;assembly=Microcharts"
+             x:Class="CurrencyChecker.Forms.Views.RemoteDetailsPage"
+             xmlns:vm="clr-namespace:CurrencyChecker.Core.ViewModels;assembly=CurrencyChecker.Core"
+             xmlns:controls="clr-namespace:CurrencyChecker.Forms.Views.Controls"
+             Title="{Binding Title}" x:DataType="vm:RemoteRateViewModel">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Jako bazowa" Order="Secondary" Command="{Binding SetAsBaseCurrencyCommand}"/>
+        <ToolbarItem Text="Zapisz dane" Order="Secondary" Command="{Binding SaveDataCommand}"/>
+    </ContentPage.ToolbarItems>
+    <controls:CurrencyDataGridControl BindingContext="{Binding CurrencyGridViewModel}"/>
+</ContentPage>

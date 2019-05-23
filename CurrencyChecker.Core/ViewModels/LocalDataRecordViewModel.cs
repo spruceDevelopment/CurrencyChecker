@@ -15,7 +15,7 @@ namespace CurrencyChecker.Core.ViewModels
         private readonly PickLocalDataViewModel _parentViewModel;
 
         private string _key;
-        public string? DisplayName => _key;
+        public string DisplayName => _key;
         public IAsyncCommand RemoveDataRecordCommand { get; }
 
         public LocalDataRecordViewModel(string key, PickLocalDataViewModel parentViewModel,IErrorHandler errorHandler)

@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 namespace CurrencyChecker.Core.Test
 {
     [TestFixture]
-    public class RateViewModelTest
+    public class RemoteRateViewModelTest
     {
-        RateViewModel _rateViewModel;
+        RemoteRateViewModel _rateViewModel;
         IExternalCurrencyService _currencyService;
         ISettingsProvider _settingsProvider;
         ILocalCurrencyService _localCurrencyService;
@@ -40,13 +40,13 @@ namespace CurrencyChecker.Core.Test
             }
             ));
 
-            
+
 
             _settingsProvider = MockRepository.GenerateMock<ISettingsProvider>();
 
             _localCurrencyService = MockRepository.GenerateMock<ILocalCurrencyService>();
 
-            _rateViewModel = new RateViewModel("EUR", "PLN", 4.30f, _currencyService, _settingsProvider, _localCurrencyService);
+            _rateViewModel = new RemoteRateViewModel("EUR", "PLN", 4.30f, _currencyService, _settingsProvider, _localCurrencyService, MockRepository.GenerateMock<IErrorHandler>());
         }
 
         [Test]
@@ -62,8 +62,8 @@ namespace CurrencyChecker.Core.Test
         {
             await _rateViewModel.Init();
 
-            Assert.AreEqual(5, _rateViewModel.Chart.Entries.Count());
-            Assert.AreEqual(0.21210f, _rateViewModel.Chart.Entries.ElementAt(3).Value);
+            Assert.AreEqual(5, _rateViewModel.CurrencyGridViewModel.Chart.Entries.Count());
+            Assert.AreEqual(0.21210f, _rateViewModel.CurrencyGridViewModel.Chart.Entries.ElementAt(3).Value);
         }
 
 

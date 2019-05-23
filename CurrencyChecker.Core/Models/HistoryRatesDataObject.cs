@@ -12,18 +12,29 @@ namespace CurrencyChecker.Core.Models
         public string? DatabaseKey { get; set; }
         [JsonProperty("base")]
         public string? Base { get; set; }
+
         [JsonProperty("rates"), Ignore]
         public Dictionary<string, float>? HistoryRates { get; set; }
+        public string? SerializedHistoryRates { get; set; }
 
 
 
-        public string? Target;
-        public string? end_at;
-        public string? start_at;
+        public string? Target{get; set;}
+        public string? end_at { get; set; }
+        public string? start_at { get; set; }
 
         public string GenerateDBKey()
         {
             return Base + "_" + Target + "_" + end_at;
+        }
+
+        public void SerializeDictionary()
+        {
+            SerializedHistoryRates = JsonConvert.SerializeObject(HistoryRates);
+        }
+        public void DeserializeDictionary()
+        {
+            HistoryRates = JsonConvert.DeserializeObject<Dictionary<string,float>?>(SerializedHistoryRates);
         }
     }
 }

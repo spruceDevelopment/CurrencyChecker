@@ -8,11 +8,11 @@ using Xamarin.Forms.Xaml;
 namespace CurrencyChecker.Forms.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class DetailsPage : ContentPage
+    public partial class RemoteDetailsPage : ContentPage
     {
-        private readonly RateViewModel _viewModel;
+        private readonly RemoteRateViewModel _viewModel;
 
-        public DetailsPage(RateViewModel vm)
+        public RemoteDetailsPage(RemoteRateViewModel vm)
         {
             InitializeComponent();
             BindingContext = _viewModel = vm;

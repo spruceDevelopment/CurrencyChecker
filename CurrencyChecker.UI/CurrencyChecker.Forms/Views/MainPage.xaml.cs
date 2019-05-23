@@ -33,7 +33,7 @@ namespace CurrencyChecker.Forms.Views
 
         private void ItemsListView_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            _viewModel.ItemTappedCommand.ExecuteAsync((RateViewModel)e.Item).FireAndForgetSafeAsync(SimpleIoc.Default.GetInstance<IErrorHandler>());
+            _viewModel.ItemTappedCommand.ExecuteAsync((RemoteRateViewModel)e.Item).FireAndForgetSafeAsync(SimpleIoc.Default.GetInstance<IErrorHandler>());
         }
     }
 }

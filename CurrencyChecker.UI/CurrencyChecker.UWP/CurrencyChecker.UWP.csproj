@@ -152,9 +152,9 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CurrencyChecker\CurrencyChecker.csproj">
-      <Project>{BACCE00A-A60B-4FE4-8473-0A4200966C81}</Project>
-      <Name>CurrencyChecker</Name>
+    <ProjectReference Include="..\CurrencyChecker.Forms\CurrencyChecker.Forms.csproj">
+      <Project>{8b072ffa-da56-4bbe-8e63-f84bb556a36c}</Project>
+      <Name>CurrencyChecker.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

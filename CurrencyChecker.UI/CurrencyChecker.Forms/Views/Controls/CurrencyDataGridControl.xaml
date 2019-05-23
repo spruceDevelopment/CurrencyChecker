@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Grid xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms"
+             xmlns:microchartsCore="clr-namespace:Microcharts;assembly=Microcharts"
+            xmlns:vm="clr-namespace:CurrencyChecker.Core.ViewModels;assembly=CurrencyChecker.Core"
+             x:Class="CurrencyChecker.Forms.Views.Controls.CurrencyDataGridControl"
+      x:DataType="vm:CurrencyDataGridViewModel">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <microcharts:ChartView Chart="{Binding Chart}"/>
+    <ListView Grid.Row="1" ItemsSource="{Binding Chart.Entries}">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell x:DataType="microchartsCore:Entry">
+                    <StackLayout Orientation="Horizontal" Padding="10">
+                        <Label Text="{Binding Label}" Style="{DynamicResource ListItemTextStyle}"/>
+                        <Label Text="{Binding ValueLabel}" HorizontalOptions="EndAndExpand" Style="{DynamicResource ListItemDetailTextStyle}"/>
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</Grid>

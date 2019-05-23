@@ -19,6 +19,7 @@ namespace CurrencyChecker.Core.Services
         {
             await CheckInit(Connection);
             record.DatabaseKey = record.GenerateDBKey();
+            record.SerializeDictionary();
             await Connection.InsertAsync(record);
         }
 
@@ -35,7 +36,9 @@ namespace CurrencyChecker.Core.Services
         {
             var connection = Connection;
                 await CheckInit(connection);
-                return await connection.ExecuteScalarAsync<HistoryRatesDataObject>("select * from HistoryRatesDataObject where DatabaseKey = ?", key);
+            var list = await connection.QueryAsync<HistoryRatesDataObject>("select * from HistoryRatesDataObject where DatabaseKey = ?", key);
+            list[0].DeserializeDictionary();
+            return list[0];
         }
 
 

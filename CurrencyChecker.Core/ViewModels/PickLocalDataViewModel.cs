@@ -30,7 +30,8 @@ namespace CurrencyChecker.Core.ViewModels
 
         private async Task ItemTapped(LocalDataRecordViewModel arg)
         {
-            await Navigator.PushAsync("localDataDetails", arg);
+            var data = await _localCurrencyService.GetRecordAsync(arg.DisplayName);
+            await Navigator.PushAsync("localDataDetails", new LocalRateViewModel(data));
         }
 
         public override async Task Init()

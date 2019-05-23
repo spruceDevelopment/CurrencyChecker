@@ -27,7 +27,7 @@
                       ItemTapped="ItemsListView_ItemTapped">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <ViewCell x:DataType="vm:RateViewModel">
+                            <ViewCell x:DataType="vm:RemoteRateViewModel">
                                 <Grid Padding="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>

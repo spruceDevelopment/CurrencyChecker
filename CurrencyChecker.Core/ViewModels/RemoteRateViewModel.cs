@@ -13,7 +13,7 @@ using CurrencyChecker.Core.Models;
 
 namespace CurrencyChecker.Core.ViewModels
 {
-    public class RateViewModel : BaseViewModel
+    public class RemoteRateViewModel : BaseViewModel
     {
         public string TargetKey { get; }
         private readonly float _value;
@@ -22,14 +22,14 @@ namespace CurrencyChecker.Core.ViewModels
         private readonly ILocalCurrencyService _localCurrencyService;
         private HistoryRatesDataObject? _currentDataObject;
 
+        public CurrencyDataGridViewModel CurrencyGridViewModel {get;}
+
         public string DisplayValue => _value.ToString("N4");
         public string BaseKey { get; }
-        Chart? _chart;
-        public Chart? Chart { get => _chart; set { SetProperty(ref _chart, value); } }
         public IAsyncCommand SetAsBaseCurrencyCommand { get;}
         public IAsyncCommand SaveDataCommand { get;  }
 
-        public RateViewModel(string baseKey, string targetKey, float value, IExternalCurrencyService currencyService, ISettingsProvider settingsProvider, ILocalCurrencyService localCurrencyService)
+        public RemoteRateViewModel(string baseKey, string targetKey, float value, IExternalCurrencyService currencyService, ISettingsProvider settingsProvider, ILocalCurrencyService localCurrencyService, IErrorHandler errorHandler)
         {
             TargetKey = targetKey;
             _value = value;
@@ -38,37 +38,20 @@ namespace CurrencyChecker.Core.ViewModels
             _localCurrencyService = localCurrencyService;
             BaseKey = baseKey;
             Title = $"1 {baseKey} = x {targetKey}";
-            SetAsBaseCurrencyCommand = new AsyncCommand(SetAsBaseCurrency);
-            SaveDataCommand = new AsyncCommand(SaveData);
+            SetAsBaseCurrencyCommand = new AsyncCommand(SetAsBaseCurrency, errorHandler: errorHandler);
+            SaveDataCommand = new AsyncCommand(SaveData, errorHandler: errorHandler);
+            CurrencyGridViewModel = new CurrencyDataGridViewModel();
         }
 
 
         public override async Task Init()
         {
-            var draftEntries = new List<Entry>();
             var result = await _currencyService.GetHistoryRates(BaseKey, TargetKey, DateTime.Today.AddDays(-30), DateTime.Today);
             if (result?.HistoryRates == null)
                 return;
             _currentDataObject = result;
-            var sorted = result.HistoryRates.OrderBy(x => x.Key);
-            foreach (var item in sorted)
-            {
-                var entry = new Entry(item.Value);
-                entry.Label = DateTime.Parse(item.Key).ToString("dd-MM-yyyy");
-                entry.ValueLabel = item.Value.ToString("N4");
-                entry.Color = SKColor.Parse("#7777FF");
-                draftEntries.Add(entry);
-            }
-            Chart = new LineChart()
-            {
-                Entries = draftEntries,
-                LineMode = LineMode.Spline,
-                LineSize = 5,
-                PointMode = PointMode.Circle,
-                PointSize = 12,
-                MaxValue = draftEntries.Max(x => x.Value) + 0.0001f,
-                MinValue = draftEntries.Min(x => x.Value) - 0.0001f,
-            };
+
+            CurrencyGridViewModel.PassNewData(result);
         }
 
 
